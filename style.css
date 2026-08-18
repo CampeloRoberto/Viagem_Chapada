@@ -215,6 +215,12 @@ h1, h2, h3 {
   margin: 0 0 4px;
   font-size: 1.15rem;
 }
+.lodging-location {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  color: var(--wood-dark);
+  font-weight: 600;
+}
 .lodging-total {
   margin: 6px 0 0;
   font-size: 1rem;
@@ -337,6 +343,31 @@ h1, h2, h3 {
 }
 
 /* ===== Routes ===== */
+.route-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.route-tab {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.route-tab:hover {
+  border-color: var(--green-light);
+  color: var(--green-dark);
+}
+.route-tab.active {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  color: #ffffff;
+}
 .routes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

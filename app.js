@@ -12,6 +12,8 @@ const CONFIG = {
       id: "barata",
       badge: "Mais barata",
       name: "Viagem barata",
+      location: "Alto Paraíso de Goiás",
+      routeSet: "altoParaiso",
       total: 929,
       link: "https://www.airbnb.com.br/rooms/745062444003812524",
       photos: [
@@ -22,9 +24,26 @@ const CONFIG = {
       ],
     },
     {
+      id: "barata2",
+      badge: "Menos gasolina",
+      name: "Viagem barata 02",
+      location: "São Jorge",
+      routeSet: "saoJorge",
+      total: 1020,
+      link: "https://www.airbnb.com.br/rooms/1581209780199628073",
+      photos: [
+        { src: "images/barata-02-geral.png", caption: "Geral" },
+        { src: "images/barata-02-localizacao.png", caption: "Localização" },
+        { src: "images/barata-02-quartos.png", caption: "Quartos" },
+        { src: "images/barata-02-quintal.png", caption: "Quintal" },
+      ],
+    },
+    {
       id: "ideal",
       badge: "Escolha equilibrada",
       name: "Viagem ideal",
+      location: "Alto Paraíso de Goiás",
+      routeSet: "altoParaiso",
       total: 1858,
       link: "https://www.airbnb.com.br/rooms/1408940796117281906",
       photos: [
@@ -38,6 +57,8 @@ const CONFIG = {
       id: "cara",
       badge: "Top de linha",
       name: "Viagem cara",
+      location: "Alto Paraíso de Goiás",
+      routeSet: "altoParaiso",
       total: 2879,
       link: "https://www.airbnb.com.br/rooms/1114486706277617874",
       photos: [
@@ -50,40 +71,76 @@ const CONFIG = {
   ],
 
   // Distâncias aproximadas (km) — ver plano/README para fontes; ajuste se necessário.
-  routes: [
-    {
-      id: "ida-brasilia-altoparaiso",
-      from: "Brasília (Rodoviária / Asa Sul)",
-      to: "Alto Paraíso de Goiás",
-      km: 224,
-      roundTrip: false,
-      note: "Saída sexta-feira, 14h.",
+  // Duas malhas de rota: hospedagens em Alto Paraíso x a hospedagem em São Jorge
+  // (mais perto da Cachoeira do Segredo e do Vale da Lua, logo com menos km rodado).
+  routeSets: {
+    altoParaiso: {
+      label: "Alto Paraíso (Barata, Ideal, Cara)",
+      routes: [
+        {
+          from: "Brasília (Rodoviária / Asa Sul)",
+          to: "Alto Paraíso de Goiás",
+          km: 224,
+          roundTrip: false,
+          note: "Saída sexta-feira, 14h.",
+        },
+        {
+          from: "Alto Paraíso de Goiás",
+          to: "Cachoeira do Segredo",
+          km: 53,
+          roundTrip: true,
+          note: "Ida e volta no sábado — entrada 8h–13h, trilha de 3,5 km.",
+        },
+        {
+          from: "Alto Paraíso de Goiás",
+          to: "Vale da Lua",
+          km: 35,
+          roundTrip: false,
+          note: "Domingo de manhã cedo — aberto das 8h15 às 16h.",
+        },
+        {
+          from: "Vale da Lua",
+          to: "Brasília",
+          km: 259,
+          roundTrip: false,
+          note: "Volta direta para casa no domingo.",
+        },
+      ],
     },
-    {
-      id: "altoparaiso-cachoeira",
-      from: "Alto Paraíso de Goiás",
-      to: "Cachoeira do Segredo",
-      km: 53,
-      roundTrip: true,
-      note: "Ida e volta no sábado — entrada 8h–13h, trilha de 3,5 km.",
+    saoJorge: {
+      label: "São Jorge (Barata 02)",
+      routes: [
+        {
+          from: "Brasília (Rodoviária / Asa Sul)",
+          to: "São Jorge",
+          km: 255,
+          roundTrip: false,
+          note: "Saída sexta-feira, 14h.",
+        },
+        {
+          from: "São Jorge",
+          to: "Cachoeira do Segredo",
+          km: 16,
+          roundTrip: true,
+          note: "Ida e volta no sábado — entrada 8h–13h, trilha de 3,5 km.",
+        },
+        {
+          from: "São Jorge",
+          to: "Vale da Lua",
+          km: 9,
+          roundTrip: false,
+          note: "Domingo de manhã cedo — aberto das 8h15 às 16h.",
+        },
+        {
+          from: "Vale da Lua",
+          to: "Brasília",
+          km: 246,
+          roundTrip: false,
+          note: "Volta direta para casa no domingo (aprox., saindo perto de São Jorge).",
+        },
+      ],
     },
-    {
-      id: "altoparaiso-valedalua",
-      from: "Alto Paraíso de Goiás",
-      to: "Vale da Lua",
-      km: 35,
-      roundTrip: false,
-      note: "Domingo de manhã cedo — aberto das 8h15 às 16h.",
-    },
-    {
-      id: "volta-valedalua-brasilia",
-      from: "Vale da Lua",
-      to: "Brasília",
-      km: 259,
-      roundTrip: false,
-      note: "Volta direta para casa no domingo.",
-    },
-  ],
+  },
 
   fuelDefaults: {
     pricePerLiter: 6.5,
@@ -151,11 +208,16 @@ const CONFIG = {
 const fmtBRL = (v) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const totalKmPerCar = () =>
-  CONFIG.routes.reduce((sum, r) => sum + (r.roundTrip ? r.km * 2 : r.km), 0);
+const totalKmPerCar = (routeSetKey) =>
+  CONFIG.routeSets[routeSetKey].routes.reduce(
+    (sum, r) => sum + (r.roundTrip ? r.km * 2 : r.km),
+    0
+  );
 
 const attractionsPerPerson = () =>
   CONFIG.attractions.reduce((sum, a) => sum + a.pricePerPerson, 0);
+
+let activeRouteSet = "altoParaiso";
 
 // ===== Render: Hospedagem =====
 function renderLodgings() {
@@ -183,6 +245,7 @@ function renderLodgings() {
         <div class="lodging-body">
           <span class="badge">${l.badge}</span>
           <h3>${l.name}</h3>
+          <p class="lodging-location">📍 ${l.location}</p>
           <p class="lodging-total">${fmtBRL(l.total)} <span>total / ${CONFIG.trip.guests} pessoas</span></p>
           <p class="lodging-per-person">${fmtBRL(perPerson)} <span>por pessoa</span></p>
           ${diff > 0 ? `<p class="lodging-diff">+ ${fmtBRL(diff)} vs. mais barata</p>` : `<p class="lodging-diff lodging-diff--best">A opção mais barata</p>`}
@@ -220,8 +283,8 @@ function renderChart() {
     (l) => l.total / CONFIG.trip.guests
   );
   const max = Math.max(...perPersonValues);
-  // rampa sequencial verde validada (claro -> escuro = custo crescente)
-  const ramp = ["#7fae73", "#5c8f4f", "#2f5233"];
+  // rampa sequencial verde validada (claro -> escuro = custo crescente, 4 níveis)
+  const ramp = ["#96c189", "#7fae73", "#5c8f4f", "#2f5233"];
   const sorted = [...CONFIG.lodgings].sort((a, b) => a.total - b.total);
 
   chart.innerHTML = sorted
@@ -268,9 +331,31 @@ function mapsLinkHref(from, to) {
   )}&destination=${encodeURIComponent(to)}`;
 }
 
-function renderRoutes() {
+function renderRouteTabs() {
+  const tabs = document.getElementById("route-tabs");
+  tabs.innerHTML = Object.entries(CONFIG.routeSets)
+    .map(
+      ([key, rs]) => `
+      <button class="route-tab${key === activeRouteSet ? " active" : ""}" data-set="${key}">
+        ${rs.label}
+      </button>`
+    )
+    .join("");
+
+  tabs.querySelectorAll(".route-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.set === activeRouteSet) return;
+      activeRouteSet = btn.dataset.set;
+      renderRouteTabs();
+      renderRoutesGrid();
+      calcFuel();
+    });
+  });
+}
+
+function renderRoutesGrid() {
   const grid = document.getElementById("routes-grid");
-  grid.innerHTML = CONFIG.routes
+  grid.innerHTML = CONFIG.routeSets[activeRouteSet].routes
     .map((r) => {
       const distanceLabel = r.roundTrip
         ? `${r.km} km (ida) · ${r.km * 2} km ida e volta`
@@ -302,27 +387,40 @@ function calcFuel() {
   const kml = parseFloat(document.getElementById("fuel-kml").value) || 1;
   const cars = parseInt(document.getElementById("fuel-cars").value) || 1;
 
-  const kmPerCar = totalKmPerCar();
-  const liters = (kmPerCar / kml) * cars;
-  const total = liters * price;
-  const perPerson = total / CONFIG.trip.guests;
+  const fuelPerPersonBySet = {};
 
-  document.getElementById("fuel-km-total").textContent = `${kmPerCar} km`;
-  document.getElementById("fuel-liters").textContent = `${liters.toFixed(1)} L`;
-  document.getElementById("fuel-total").textContent = fmtBRL(total);
-  document.getElementById("fuel-per-person").textContent = fmtBRL(perPerson);
+  Object.keys(CONFIG.routeSets).forEach((key) => {
+    const kmPerCar = totalKmPerCar(key);
+    const liters = (kmPerCar / kml) * cars;
+    const total = liters * price;
+    fuelPerPersonBySet[key] = total / CONFIG.trip.guests;
 
-  renderSummary(perPerson);
+    if (key === activeRouteSet) {
+      document.getElementById("fuel-km-total").textContent = `${kmPerCar} km`;
+      document.getElementById("fuel-liters").textContent = `${liters.toFixed(1)} L`;
+      document.getElementById("fuel-total").textContent = fmtBRL(total);
+      document.getElementById("fuel-per-person").textContent = fmtBRL(
+        fuelPerPersonBySet[key]
+      );
+    }
+  });
+
+  document.getElementById(
+    "fuel-calc-context"
+  ).textContent = `Calculando para a malha de rota: ${CONFIG.routeSets[activeRouteSet].label}.`;
+
+  renderSummary(fuelPerPersonBySet);
 }
 
 // ===== Resumo total por pessoa (hospedagem + combustível + ingressos) =====
-function renderSummary(fuelPerPerson) {
+function renderSummary(fuelPerPersonBySet) {
   const tbody = document.getElementById("summary-tbody");
   const ingressos = attractionsPerPerson();
 
   tbody.innerHTML = CONFIG.lodgings
     .map((l) => {
       const lodgingPerPerson = l.total / CONFIG.trip.guests;
+      const fuelPerPerson = fuelPerPersonBySet[l.routeSet];
       const total = lodgingPerPerson + fuelPerPerson + ingressos;
       return `
       <tr>
@@ -387,7 +485,8 @@ function renderHeader() {
 function init() {
   renderHeader();
   renderLodgings();
-  renderRoutes();
+  renderRouteTabs();
+  renderRoutesGrid();
   renderItinerary();
   renderFood();
 

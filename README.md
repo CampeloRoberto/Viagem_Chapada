@@ -52,6 +52,6 @@ npx serve .
 
 ## O que ajustar antes de publicar
 
-- Conferir se as distâncias das rotas (em `CONFIG.routes` no `app.js`) batem com o trajeto real combinado.
+- Conferir se as distâncias das rotas (em `CONFIG.routeSets` no `app.js`) batem com o trajeto real combinado. Há duas malhas: `altoParaiso` (Barata, Ideal, Cara) e `saoJorge` (Barata 02), selecionáveis por abas na seção "Rotas & Combustível".
 - Ajustar o preço padrão da gasolina no `CONFIG.fuelDefaults` se estiver desatualizado (o valor usado como padrão foi baseado em pesquisa de agosto/2026 no DF).
-- Conferir se as 12 fotos em `images/` estão corretas antes do `git add` — elas serão publicadas junto com o código.
+- Conferir se as 16 fotos em `images/` estão corretas antes do `git add` — elas serão publicadas junto com o código.
