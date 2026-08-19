@@ -221,6 +221,41 @@ h1, h2, h3 {
   color: var(--wood-dark);
   font-weight: 600;
 }
+.lodging-features {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.lodging-features li {
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 2px 9px 2px 22px;
+  border-radius: 999px;
+  position: relative;
+}
+.lodging-features li::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.18;
+}
+.lodging-features li.is-included {
+  background: rgba(63, 107, 57, 0.1);
+  color: var(--green-dark);
+}
+.lodging-features li.is-missing {
+  background: rgba(138, 106, 69, 0.12);
+  color: var(--wood-dark);
+}
 .lodging-total {
   margin: 6px 0 0;
   font-size: 1rem;
@@ -478,6 +513,34 @@ h1, h2, h3 {
   font-size: 1.2rem;
 }
 
+.fuel-compare {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+}
+.fuel-compare-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.86rem;
+  padding: 6px 0;
+  color: var(--text-secondary);
+}
+.fuel-compare-row span:first-child {
+  color: var(--text-primary);
+  font-weight: 600;
+  flex: 1;
+}
+.fuel-compare-diff {
+  margin: 10px 0 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  background: var(--green-light);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
 /* ===== Timeline ===== */
 .timeline {
   list-style: none;
@@ -577,6 +640,25 @@ h1, h2, h3 {
 }
 .food-card li {
   margin-bottom: 4px;
+}
+
+/* ===== Dicas ===== */
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.tip-card {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  padding: 18px 20px;
+}
+.tip-card p {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 /* ===== Footer ===== */

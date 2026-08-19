@@ -15,6 +15,7 @@ const CONFIG = {
       location: "Alto Paraíso de Goiás",
       routeSet: "altoParaiso",
       total: 929,
+      features: ["Sem piscina"],
       link: "https://www.airbnb.com.br/rooms/745062444003812524",
       photos: [
         { src: "images/barato-geral.png", caption: "Geral" },
@@ -30,6 +31,7 @@ const CONFIG = {
       location: "São Jorge",
       routeSet: "saoJorge",
       total: 1020,
+      features: ["Sem piscina"],
       link: "https://www.airbnb.com.br/rooms/1581209780199628073",
       photos: [
         { src: "images/barata-02-geral.png", caption: "Geral" },
@@ -45,6 +47,7 @@ const CONFIG = {
       location: "Alto Paraíso de Goiás",
       routeSet: "altoParaiso",
       total: 1858,
+      features: ["Hidro grande"],
       link: "https://www.airbnb.com.br/rooms/1408940796117281906",
       photos: [
         { src: "images/ideal-hidro.png", caption: "Hidro" },
@@ -60,6 +63,7 @@ const CONFIG = {
       location: "Alto Paraíso de Goiás",
       routeSet: "altoParaiso",
       total: 2879,
+      features: ["Com piscina"],
       link: "https://www.airbnb.com.br/rooms/1114486706277617874",
       photos: [
         { src: "images/caro-geral.png", caption: "Geral" },
@@ -168,11 +172,15 @@ const CONFIG = {
       time: "Sábado, 9h",
       title: "Cachoeira do Segredo",
       text: "Saída cedo para a cachoeira. Entrada permitida das 8h às 13h, trilha de 3,5 km, R$70 por pessoa. Almoço: sanduíches de frango no local.",
+      link: "https://www.instagram.com/cachoeira_do_segredo",
+      linkLabel: "@cachoeira_do_segredo",
     },
     {
       time: "Domingo, cedo",
       title: "Vale da Lua",
       text: "Visita ao Vale da Lua (aberto das 8h15 às 16h, R$50 por pessoa) e depois seguir viagem de volta.",
+      link: "https://www.instagram.com/valedaluaofficial",
+      linkLabel: "@valedaluaofficial",
     },
     {
       time: "Domingo, na volta",
@@ -187,20 +195,46 @@ const CONFIG = {
   food: [
     {
       title: "Café da manhã",
-      items: ["2 caixas de ovos", "Tapioca", "Queijo mussarela"],
+      items: [
+        "2 caixas de ovos",
+        "Tapioca",
+        "Queijo mussarela",
+        "Frutas",
+        "Peito de peru",
+        "Capuccino solúvel",
+        "Café solúvel",
+      ],
     },
     {
       title: "Almoço de sábado (na cachoeira)",
       items: ["Sanduíches de frango"],
     },
     {
-      title: "Sexta à noite",
-      items: ["Comida a combinar (talvez churrasco)"],
+      title: "Jantar de sexta",
+      items: ["Opção 01: levamos comidinhas e petiscos", "Opção 02: churrasco"],
+    },
+    {
+      title: "Jantar de sábado",
+      items: ["Jantar fora (restaurante)", "Ou preparar algo em casa"],
     },
     {
       title: "Bebidas",
       items: ["Cada um leva algo da sua preferência"],
     },
+    {
+      title: "Água",
+      items: ["Levar bastante água (trilhas e calor)", "Cada um com sua garrafa"],
+    },
+  ],
+
+  tips: [
+    "Leve seus equipamentos (sapato, mochila de trilha, garrafa de água)",
+    "Leve seus medicamentos",
+    "Na trilha, avise se estiver se sentindo mal",
+    "Viagem de carro em via vai/vem — cuidado no volante",
+    "Beba e divirta-se, mas esteja inteiro no dia seguinte",
+    "Leve desodorante",
+    "Contribua com alimentação e bebidas",
   ],
 };
 
@@ -246,6 +280,18 @@ function renderLodgings() {
           <span class="badge">${l.badge}</span>
           <h3>${l.name}</h3>
           <p class="lodging-location">📍 ${l.location}</p>
+          ${
+            l.features && l.features.length
+              ? `<ul class="lodging-features">${l.features
+                  .map(
+                    (f) =>
+                      `<li class="${
+                        f.toLowerCase().startsWith("sem") ? "is-missing" : "is-included"
+                      }">${f}</li>`
+                  )
+                  .join("")}</ul>`
+              : ""
+          }
           <p class="lodging-total">${fmtBRL(l.total)} <span>total / ${CONFIG.trip.guests} pessoas</span></p>
           <p class="lodging-per-person">${fmtBRL(perPerson)} <span>por pessoa</span></p>
           ${diff > 0 ? `<p class="lodging-diff">+ ${fmtBRL(diff)} vs. mais barata</p>` : `<p class="lodging-diff lodging-diff--best">A opção mais barata</p>`}
@@ -388,11 +434,13 @@ function calcFuel() {
   const cars = parseInt(document.getElementById("fuel-cars").value) || 1;
 
   const fuelPerPersonBySet = {};
+  const kmPerCarBySet = {};
 
   Object.keys(CONFIG.routeSets).forEach((key) => {
     const kmPerCar = totalKmPerCar(key);
     const liters = (kmPerCar / kml) * cars;
     const total = liters * price;
+    kmPerCarBySet[key] = kmPerCar;
     fuelPerPersonBySet[key] = total / CONFIG.trip.guests;
 
     if (key === activeRouteSet) {
@@ -409,7 +457,32 @@ function calcFuel() {
     "fuel-calc-context"
   ).textContent = `Calculando para a malha de rota: ${CONFIG.routeSets[activeRouteSet].label}.`;
 
+  renderFuelCompare(kmPerCarBySet, fuelPerPersonBySet);
   renderSummary(fuelPerPersonBySet);
+}
+
+// ===== Comparativo fixo entre as duas malhas (destaca a economia da Barata 02) =====
+function renderFuelCompare(kmPerCarBySet, fuelPerPersonBySet) {
+  const box = document.getElementById("fuel-compare");
+  const altoParaiso = fuelPerPersonBySet.altoParaiso;
+  const saoJorge = fuelPerPersonBySet.saoJorge;
+  const diff = altoParaiso - saoJorge;
+
+  box.innerHTML = `
+    <div class="fuel-compare-row">
+      <span>${CONFIG.routeSets.altoParaiso.label}</span>
+      <span>${kmPerCarBySet.altoParaiso} km/carro</span>
+      <span>${fmtBRL(altoParaiso)}/pessoa</span>
+    </div>
+    <div class="fuel-compare-row">
+      <span>${CONFIG.routeSets.saoJorge.label}</span>
+      <span>${kmPerCarBySet.saoJorge} km/carro</span>
+      <span>${fmtBRL(saoJorge)}/pessoa</span>
+    </div>
+    <p class="fuel-compare-diff">
+      Ficando em São Jorge (Viagem barata 02): ${kmPerCarBySet.altoParaiso - kmPerCarBySet.saoJorge} km a menos por carro
+      — ${diff >= 0 ? "economia" : "gasto extra"} de ${fmtBRL(Math.abs(diff))} por pessoa em combustível vs. Alto Paraíso.
+    </p>`;
 }
 
 // ===== Resumo total por pessoa (hospedagem + combustível + ingressos) =====
@@ -471,6 +544,19 @@ function renderFood() {
     .join("");
 }
 
+// ===== Render: Dicas =====
+function renderTips() {
+  const grid = document.getElementById("tips-grid");
+  grid.innerHTML = CONFIG.tips
+    .map(
+      (t) => `
+      <article class="card tip-card">
+        <p>${t}</p>
+      </article>`
+    )
+    .join("");
+}
+
 // ===== Header dinâmico =====
 function renderHeader() {
   document.getElementById("trip-title").textContent = CONFIG.trip.title;
@@ -489,6 +575,7 @@ function init() {
   renderRoutesGrid();
   renderItinerary();
   renderFood();
+  renderTips();
 
   document.getElementById("fuel-price").value = CONFIG.fuelDefaults.pricePerLiter;
   document.getElementById("fuel-kml").value = CONFIG.fuelDefaults.kmPerLiter;
